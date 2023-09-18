@@ -44,15 +44,9 @@ class PostController extends Controller
         }
 
         $post = new Post();
-
-        // $post->fill($data);
-
-        $post->title = $data['title'];
-        $post->description = $data['description'];
-
+        $post->fill($data);
         $post->save();
 
-        // return response()->json($post);
         return response()->json(null, 204);
     }
 
@@ -102,14 +96,8 @@ class PostController extends Controller
         $post = Post::find($id);
         if (!$post) return response(null, 404);
 
-        // $post->update($data);
+        $post->update($data);
 
-        $post->title = $data['title'];
-        $post->description = $data['description'];
-
-        $post->save();
-
-        // return response()->json($post);
         return response()->json(null, 204);
     }
 
@@ -119,6 +107,30 @@ class PostController extends Controller
     public function destroy(string $id)
     {
         $post = Post::find($id);
+        if (!$post) return response(null, 404);
+
+        $post->delete();
+        return response()->json(null, 204);
+    }
+
+    public function trash()
+    {
+        $posts = Post::onlyTrashed()->get();
+        return response()->json($posts);
+    }
+
+    public function restore(string $id)
+    {
+        $post = Post::onlyTrashed()->find($id);
+        if (!$post) return response(null, 404);
+
+        $post->restore();
+        return response()->json(null, 204);
+    }
+
+    public function drop(string $id)
+    {
+        $post = Post::onlyTrashed()->find($id);
         if (!$post) return response(null, 404);
 
         $post->forceDelete();
