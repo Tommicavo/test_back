@@ -56,16 +56,28 @@ class PostController extends Controller
     public function show(string $id)
     {
         $post = Post::find($id);
+        if (!$post) $post = Post::onlyTrashed()->find($id);
         if (!$post) return response(null, 404);
 
-        $prevPost = Post::where('id', '<', $id)->orderBy('id', 'DESC')->first();
-        if (!$prevPost) $prevPost = Post::orderBy('id', 'DESC')->first();
+        if (!$post->deleted_at) {
+            $prevPost = Post::where('id', '<', $id)->orderBy('id', 'DESC')->first();
+            if (!$prevPost) $prevPost = Post::orderBy('id', 'DESC')->first();
 
-        $nextPost = Post::where('id', '>', $id)->first();
-        if (!$nextPost) $nextPost = Post::orderBy('id')->first();
+            $nextPost = Post::where('id', '>', $id)->first();
+            if (!$nextPost) $nextPost = Post::orderBy('id')->first();
 
-        $post->prevId = $prevPost->id;
-        $post->nextId = $nextPost->id;
+            $post->prevId = $prevPost->id;
+            $post->nextId = $nextPost->id;
+        } else {
+            $prevPost = Post::onlyTrashed()->where('id', '<', $id)->orderBy('id', 'DESC')->first();
+            if (!$prevPost) $prevPost = Post::onlyTrashed()->orderBy('id', 'DESC')->first();
+
+            $nextPost = Post::onlyTrashed()->where('id', '>', $id)->first();
+            if (!$nextPost) $nextPost = Post::onlyTrashed()->orderBy('id')->first();
+
+            $post->prevId = $prevPost->id;
+            $post->nextId = $nextPost->id;
+        }
 
         return response()->json($post);
     }
