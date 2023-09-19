@@ -13,9 +13,11 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::orderBy('updated_at', 'DESC')->paginate(4);
+        $filter = $request->query('filter');
+        if (!$filter) $posts = Post::orderBy('updated_at', 'DESC')->paginate(4);
+        $posts = Post::where('title', 'LIKE', "%$filter%")->orderBy('updated_at', 'DESC')->paginate(4);
         return response()->json($posts);
     }
 

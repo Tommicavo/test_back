@@ -14,10 +14,10 @@ class PostSeeder extends Seeder
      */
     public function run(Generator $faker): void
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $new_post = new Post();
 
-            $new_post->title = $faker->word();
+            $new_post->title = $faker->company();
             $new_post->description = $faker->paragraph(3);
 
             $new_post->save();
